@@ -6,4 +6,7 @@ class Group(models.Model):
         max_length=50, 
         unique=True
     )
-    created_at = models.DateTimeField(auto_now_add=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __repr__(self) -> str:
+        return f'<Group - [{self.id}] - {self.scientific_name}'
