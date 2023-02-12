@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PetView, PetDetailView
+from pets.views import PetView, PetDetailView
 
 urlpatterns = [
     path("pets/", PetView.as_view()),

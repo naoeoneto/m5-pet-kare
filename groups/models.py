@@ -9,4 +9,4 @@ class Group(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __repr__(self) -> str:
-        return f'<Group - [{self.id}] - {self.scientific_name}'
+        return f'<Group - [{self.id}] - {self.scientific_name}>'

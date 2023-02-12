@@ -9,4 +9,4 @@ class Trait(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __repr__(self) -> str:
-        return f'<Trait - [{self.id}] - {self.name}'
+        return f'<Trait - [{self.id}] - {self.name}>'
