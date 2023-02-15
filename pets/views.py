@@ -60,16 +60,52 @@ class PetDetailView(APIView):
 
     def patch(self, request: Request, pet_id: int) -> Response:
         pet = get_object_or_404(Pet, id=pet_id)
-        serializer = PetSerializer(pet)
+        serializer = PetSerializer(pet, request.data, partial=True)
+        print('passou')
         serializer.is_valid(raise_exception=True)
+        print('passou de novo')
+        # if serializer.is_valid():
+        traits = serializer.validated_data.pop("traits", None)
+        group = serializer.validated_data.pop("group", None)
+            
+        if group:
+            group_obj = Group.objects.filter(scientific_name__iexact=group["scientific_name"]).first()
+            print('1', repr(group_obj))
+            if not group_obj:
+                group_obj = Group.objects.create(**group)
+                print('2', repr(group_obj))
+                pet.group = group_obj
+                pet.save()
+            else:    
+                pet.group = group_obj
+                print('3', repr(pet.group))
+                pet.save()
 
-        traits = serializer.validated_data.pop("traits")
-        group = serializer.validated_data.pop("group")
-        group_obj = Group.objects.filter(scientific_name__iexact=group["scientific_name"]).first()
+        if traits:
+            for trait in traits:
+                trait_obj = Trait.objects.filter(name__iexact=traits["name"]).first()
+                if trait_obj:
+                    for key, value in traits.items():
+                        setattr(pet.traits, key, value)
+                        pet.traits.save()
+                
+                for trait in traits:
+                    trait_obj = Trait.objects.create(**trait)
+                    pet.traits.save(trait_obj)
+            
+        for key, value in serializer.validated_data.items():
+            if key == 'sex':
+                try:
+                    ...
+                except AssertionError:
+                    ...
+            setattr(pet, key, value)
+            pet.save()
+        serializer = PetSerializer(pet)
 
-
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(serializer.data, status.HTTP_200_OK)
+        # print(serializer.errors)
+        # return Response({'msg': 'msg aleatória'}, status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request: Request, pet_id: int) -> Response:
         pet = get_object_or_404(Pet, id=pet_id)
